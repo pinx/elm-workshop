@@ -43,9 +43,17 @@ searchFeed query =
 
     task =
       Http.get responseDecoder url
-        |> Task.map SetResults
+    --    |> Task.map SetResults
+    actionyTask : Task Http.Error Action
+    actionyTask = Task.map SetResults task
+    errorProofTask : Task x Action
+    -- Pass in the task and the function for the case of failure
+    errorProofTask =
+      Task.onError 
+        actionyTask 
+        (\_ -> Task.succeed (SetResults []))
   in
-    Task.onError task (\_ -> Task.succeed (SetResults []))
+    errorProofTask
 
 
 responseDecoder : Decoder (List SearchResult)
@@ -58,9 +66,9 @@ searchResultDecoder =
   Json.Decode.object3
     SearchResult
     -- See https://developer.github.com/v3/search/#example
-    ("TODO what field goes here?" := Json.Decode.int)
-    ("TODO what field goes here?" := Json.Decode.string)
-    ("TODO what field goes here?" := Json.Decode.int)
+    ("id" := Json.Decode.int)
+    ("full_name" := Json.Decode.string)
+    ("stargazers_count" := Json.Decode.int)
 
 
 type alias Model =
@@ -97,7 +105,7 @@ view address model =
         , span [ class "tagline" ] [ text "“Like GitHub, but for Elm things.”" ]
         ]
     , input [ class "search-query", onInput address SetQuery, defaultValue model.query ] []
-    , button [ class "search-button", onClick address Search ] [ text "Search" ]
+    , button [type' "submit", class "search-button", onClick address Search ] [ text "Search" ]
     , ul
         [ class "results" ]
         (List.map (viewSearchResult address) model.results)

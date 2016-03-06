@@ -69,12 +69,12 @@ view address model =
     [ class "content" ]
     [ header
         []
-        [ h1 [] [ text "ElmHub" ]
+        [ h1 [] [ text "Hello world" ]
         , span [ class "tagline" ] [ text "“Like GitHub, but for Elm things.”" ]
         ]
     , ul
         [ class "results" ]
-        [{- TODO use model.results and viewSearchResults to display results -}]
+        (List.map viewSearchResult model.results)
     ]
 
 
@@ -84,7 +84,7 @@ viewSearchResult result =
     []
     [ span [ class "star-count" ] [ text (toString result.stars) ]
       -- TODO replace the following span with a link that opens in a new window!
-    , span [ class "result-name" ] [ text result.name ]
+    , a [ class "result-name", href ("https://github.com/" ++ result.name), target "_blank"] [ text result.name ]
     ]
 
 

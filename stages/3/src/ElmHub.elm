@@ -112,15 +112,12 @@ viewSearchResult address result =
         ]
         [ text result.name ]
     , button
-        -- TODO add an onClick handler that sends a HideById action
-        [ class "hide-result" ]
+        [ class "hide-result", onClick address (HideById result.id) ]
         [ text "X" ]
     ]
 
 
-type Action
-  = SetQuery String
-  | HideById ResultId
+type Action = SetQuery String | HideById ResultId
 
 
 update : Action -> Model -> ( Model, Effects Action )
@@ -131,8 +128,7 @@ update action model =
 
     HideById idToHide ->
       let
-        -- TODO build a new model without the given ID present anymore.
         newModel =
-          model
+          { model | results = List.filter (\{id} -> id /= idToHide) model.results}
       in
         ( newModel, Effects.none )

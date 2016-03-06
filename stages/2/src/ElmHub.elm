@@ -86,7 +86,7 @@ view address model =
 viewSearchResult : Address Action -> SearchResult -> Html
 viewSearchResult address result =
   li
-    []
+    [ ]
     [ span [ class "star-count" ] [ text (toString result.stars) ]
     , a
         [ href ("https://github.com/" ++ result.name)
@@ -95,8 +95,8 @@ viewSearchResult address result =
         ]
         [ text result.name ]
     , button
-        -- TODO add an onClick handler that sends a HideById action
-        [ class "hide-result" ]
+        [ class "hide-result"
+        , onClick address {actionType = "HIDE_BY_ID", payload = result.id} ]
         [ text "X" ]
     ]
 
@@ -106,14 +106,17 @@ type alias Action =
   , payload : Int
   }
 
-
 update : Action -> Model -> Model
 update action model =
-  if action.actionType == "HIDE_BY_ID" then
+  if (Debug.log "actiontype:" action).actionType == "HIDE_BY_ID" then
     let
-      -- TODO build a new model without the given ID present anymore.
+      is_ok : SearchResult -> Bool
+      is_ok result =
+        result.id /= action.payload
+
+      newResults = List.filter is_ok model.results
       newModel =
-        model
+        {model | results = newResults}
     in
       newModel
   else
